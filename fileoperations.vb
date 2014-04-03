@@ -3,7 +3,7 @@ Option Strict On
 
 Imports System.ComponentModel
 Imports System.IO
-
+' 5 part2
 Public Class FileOperations
 
     Private Const mcstrAssemblySep1 As String = "AssemblyVersion("""
