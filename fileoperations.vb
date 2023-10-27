@@ -1,31 +1,37 @@
-Option Explicit On 
+Option Explicit On
 Option Strict On
 
 Imports System.ComponentModel
 Imports System.IO
-' 5 part2
+
 Public Class FileOperations
 
     Private Const mcstrAssemblySep1 As String = "AssemblyVersion("""
     Private Const mcstrAssemblySep2 As String = """)>"
     Private Const mcchrSeparator As Char = ChrW(57347) ' E003
 
-    Public Shared Function OpenFileinNotepad(ByVal rstrFileName As String, _
+    Public Shared Function OpenFileinNotepad(ByVal rstrFileName As String,
                                              ByRef rstrErrorMsg As String) As Integer
 
         Return OpenFile("notepad.exe", rstrFileName, rstrErrorMsg)
     End Function
 
-    Public Shared Function OpenFile(ByVal rstrFileName As String, _
+    Public Shared Function OpenFileinNotepadPlusPlus(ByVal rstrFileName As String,
+                                         ByRef rstrErrorMsg As String) As Integer
+
+        Return OpenFile("notepad++.exe", """" + rstrFileName + """", rstrErrorMsg)
+    End Function
+
+    Public Shared Function OpenFile(ByVal rstrFileName As String,
                                     ByRef rstrErrorMsg As String) As Integer
 
         Return OpenFile(rstrFileName, Nothing, rstrErrorMsg)
     End Function
-    Public Shared Function OpenFile(ByVal rstrFileName As String, _
-                                    ByVal rstrArguments As String, _
+    Public Shared Function OpenFile(ByVal rstrFileName As String,
+                                    ByVal rstrArguments As String,
                                     ByRef rstrErrorMsg As String) As Integer
 
-        Dim strPathOfFile As String
+        Dim strPathOfFile As String = ""
         If System.IO.Path.GetFileName(rstrFileName) <> rstrFileName Then
             strPathOfFile = rstrFileName.Substring(0, rstrFileName.LastIndexOf("\"))
         End If
@@ -61,8 +67,8 @@ Public Class FileOperations
 
     End Function
 
-    Public Shared Sub File_AppendText(ByVal rstrFile As String, _
-                                      ByVal rstrText As String, _
+    Public Shared Sub File_AppendText(ByVal rstrFile As String,
+                                      ByVal rstrText As String,
                                       ByVal rblnCRLF_AtTop As Boolean)
         ' Append the text to the bottom of the file
         Dim sw As StreamWriter
@@ -80,9 +86,9 @@ Public Class FileOperations
         Return System.IO.Path.GetTempPath()
     End Function
 
-    Public Shared Function String_To_Tempfile(ByVal rstrText As String, _
-                                              ByVal rstrTempFileNamePrefix As String, _
-                                              ByVal rstrTempFileExtension As String, _
+    Public Shared Function String_To_Tempfile(ByVal rstrText As String,
+                                              ByVal rstrTempFileNamePrefix As String,
+                                              ByVal rstrTempFileExtension As String,
                                               ByVal rblnOpenFile As Boolean) As Integer
         ' Write the passed string to a temporary text file in the TEMP directory
         ' strText                   the string to write to the file
@@ -100,8 +106,8 @@ Public Class FileOperations
 
     End Function
 
-    Public Shared Function String_To_File(ByVal rstrText As String, _
-                                          ByVal rstrFilePathName As String, _
+    Public Shared Function String_To_File(ByVal rstrText As String,
+                                          ByVal rstrFilePathName As String,
                                           ByVal rblnOpenFile As Boolean) As Integer
         ' Write the passed string to a text file
 
@@ -123,7 +129,7 @@ Public Class FileOperations
         zWriter.Close()
 
         If rblnOpenFile = True Then
-            Dim strMsg As String
+            Dim strMsg As String = ""
             Dim rc As Integer = FileOperations.OpenFile(rstrFilePathName, strMsg)
 
             If rc > 4 Then
@@ -135,7 +141,7 @@ Public Class FileOperations
 
     End Function
 
-    Public Shared Function String_To_Array(ByVal rstrText As String, _
+    Public Shared Function String_To_Array(ByVal rstrText As String,
                                            ByRef rstrReturnArray As String()) As Integer
         ' Write the passed string to an array
 
@@ -145,7 +151,7 @@ Public Class FileOperations
     End Function
 
 
-    Public Shared Function Array_To_String(ByVal rstrArray As String(), _
+    Public Shared Function Array_To_String(ByVal rstrArray As String(),
                                            ByRef rstrReturnString As String) As Integer
         ' Write the passed array, return a string
 
@@ -156,7 +162,7 @@ Public Class FileOperations
             Return 0
         End If
 
-        Dim strString As String
+        Dim strString As String = ""
         For Each strItem As String In rstrArray
             strString &= strItem & mcchrSeparator
         Next
@@ -167,30 +173,30 @@ Public Class FileOperations
         rstrReturnString = strString
 
     End Function
-    Public Shared Function Array_To_Tempfile(ByVal rstrArray As String(), _
-                                             ByVal rstrTempFileNamePrefix As String, _
-                                             ByVal rstrTempFileExtension As String, _
+    Public Shared Function Array_To_Tempfile(ByVal rstrArray As String(),
+                                             ByVal rstrTempFileNamePrefix As String,
+                                             ByVal rstrTempFileExtension As String,
                                              ByVal rblnOpenFile As Boolean) As Integer
         ' Write the passed Array to a string, then the string to a temporary text file in the TEMP directory
         ' strArray                  the array to write to the file
         ' rstrTempFileNamePrefix    if creating a filename (rstrTempFilePathName), use this as a prefix
         ' rblnOpenFile              open the file after creating it
 
-        Dim strText As String
+        Dim strText As String = ""
         Array_To_String(rstrArray, strText)
 
         Return String_To_Tempfile(strText, rstrTempFileNamePrefix, rstrTempFileExtension, rblnOpenFile)
 
     End Function
 
-    Public Shared Function File_To_String(ByVal rstrFilePathName As String, _
+    Public Shared Function File_To_String(ByVal rstrFilePathName As String,
                                           ByRef rstrReturnString As String) As Integer
         ' Read the passed file & return it in a string
 
         ' Does the file already exist?
         If File.Exists(rstrFilePathName) = False Then Return 1
 
-        Dim strText As String
+        Dim strText As String = ""
         Try
             ' Create an instance of StreamReader to read from a file.
             Dim sr As StreamReader = New StreamReader(rstrFilePathName)
@@ -250,8 +256,8 @@ Public Class FileOperations
 
     End Function
 
-    Public Shared Function GetTempFileName(ByVal rstrSubDir As String, _
-                                           ByVal rstrFileNamePrefix As String, _
+    Public Shared Function GetTempFileName(ByVal rstrSubDir As String,
+                                           ByVal rstrFileNamePrefix As String,
                                            ByVal rstrExtension As String) As String
         ' Get a temp file name
         '   rstrSubDir          a sub dir of default \TEMP - created if doesn't exist
@@ -289,7 +295,7 @@ Public Class FileOperations
         End If
 
         'If shortnname is a dir it may have a "\" on the end
-        Dim strEndSlash As String
+        Dim strEndSlash As String = ""
         If Mid(rstrShort_Name, rstrShort_Name.Length) = "\" Then
             strShortName = Mid(rstrShort_Name, 1, rstrShort_Name.Length - 1)
             strEndSlash = "\"
@@ -330,7 +336,7 @@ Public Class FileOperations
         ConvertShortNameToLongName = strResult & strEndSlash
     End Function
 
-    Public Shared Function RemoveIllegalFileNameChars(ByVal rstrFileName As String, _
+    Public Shared Function RemoveIllegalFileNameChars(ByVal rstrFileName As String,
                                                       ByVal rstrReplaceChar As String) As String
         ' remove from a string all chars that are illegal in file names.
         ' Optionally replace them with something else.
@@ -355,39 +361,39 @@ Public Class FileOperations
         ' Format :
         '           <Assembly: AssemblyVersion("A.B.C.D")>
 
-        Dim strVersion As String
+        Dim strVersion As String = ""
         AssemblyInfo_GetBits(rstrAssmeblyInfoFile, Nothing, strVersion, Nothing)
         Return strVersion
     End Function
 
 
-    Public Shared Sub AssemblyInfo_SetVersion(ByVal rstrAssmeblyInfoFile As String, _
+    Public Shared Sub AssemblyInfo_SetVersion(ByVal rstrAssmeblyInfoFile As String,
                                               ByVal rstrNewVersion As String)
         ' Set the version of the Assembly file
         ' Format :
         '           <Assembly: AssemblyVersion("A.B.C.D")>
 
-        Dim strBefore As String
-        Dim strOldVersion As String
-        Dim strAfter As String
+        Dim strBefore As String = ""
+        Dim strOldVersion As String = ""
+        Dim strAfter As String = ""
         ' Read the file and extract the Version
         AssemblyInfo_GetBits(rstrAssmeblyInfoFile, strBefore, strOldVersion, strAfter)
 
         ' Stick it back with the new version 
-        String_To_File(strBefore & mcstrAssemblySep1 & rstrNewVersion & mcstrAssemblySep2 & strAfter, _
-                       rstrAssmeblyInfoFile, _
+        String_To_File(strBefore & mcstrAssemblySep1 & rstrNewVersion & mcstrAssemblySep2 & strAfter,
+                       rstrAssmeblyInfoFile,
                        False)
 
     End Sub
 
-    Private Shared Sub AssemblyInfo_GetBits(ByVal rstrAssmeblyInfoFile As String, _
-                                            ByRef rstrFirstBit As String, _
-                                            ByRef rstrVersion As String, _
+    Private Shared Sub AssemblyInfo_GetBits(ByVal rstrAssmeblyInfoFile As String,
+                                            ByRef rstrFirstBit As String,
+                                            ByRef rstrVersion As String,
                                             ByRef rstrLastBit As String)
 
         ' Read the file into a string
-        Dim strText As String
-        File_To_String(rstrAssmeblyInfoFile, _
+        Dim strText As String = ""
+        File_To_String(rstrAssmeblyInfoFile,
                           strText)
 
         ' Break up the AssemblyFile into "before" and "after" the Version bit
@@ -504,7 +510,7 @@ Public Class FileNameInfo
     Public ReadOnly Property GetExtension() As String
         Get
             ' Get the file name, ext is everything asfter the first "." (note - there may be 2 "."s)
-            Dim strExt As String
+            Dim strExt As String = ""
             StringFunctions.ParseVar(Me.GetFileName, Nothing, ".", strExt)
             Return strExt
         End Get
@@ -513,7 +519,7 @@ Public Class FileNameInfo
     Public ReadOnly Property GetFileNameNoExtension() As String
         Get
             ' Get the file name, ext is everything asfter the first "." (note - there may be 2 "."s)
-            Dim strFileNameNoExt As String
+            Dim strFileNameNoExt As String = ""
             StringFunctions.ParseVar(Me.GetFileName, strFileNameNoExt, ".", Nothing)
             Return strFileNameNoExt
         End Get

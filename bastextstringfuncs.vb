@@ -23,7 +23,7 @@ Module basTextStringFuncs
 	'    Passed a string and 2 sub strings.
 	'    substring 1 is replaced by substring 2 in the main string
 	'
-	'fncWord
+	'FncWord
 	'    search a Sentence and return Word number n
 	'    ie search string for delimiter & return the string between delimiter "n-1" and "n"
 	'
@@ -103,10 +103,8 @@ Module basTextStringFuncs
 		Const cintMaxSep As Short = 9
 		Dim intPos As Object
 		Dim strWork As Object
-		'UPGRADE_WARNING: Lower bound of array strSep was changed from 1 to 0. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1033"'
 		Dim strSep(cintMaxSep) As String
 		
-		'UPGRADE_WARNING: Lower bound of array strPart was changed from 1 to 0. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1033"'
 		Dim strPart(cintMaxSep + 1) As Object
 		Dim ix As Object
 		
@@ -120,86 +118,43 @@ Module basTextStringFuncs
 		strSep(8) = rSep8
 		strSep(9) = rSep9
 		
-		'UPGRADE_WARNING: Couldn't resolve default property of object strWork. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		strWork = rString
 		' for each separater in turn...
 		For ix = 1 To cintMaxSep
-			'UPGRADE_WARNING: Couldn't resolve default property of object ix. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-			'UPGRADE_WARNING: Couldn't resolve default property of object strWork. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-			'UPGRADE_WARNING: Couldn't resolve default property of object intPos. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 			intPos = InStr(1, strWork, strSep(ix))
-			'UPGRADE_WARNING: Couldn't resolve default property of object ix. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-			'UPGRADE_WARNING: Couldn't resolve default property of object intPos. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 			If intPos = 0 Or strSep(ix) = "" Then
 				' separater not found, or end of seperators
-				'UPGRADE_WARNING: Couldn't resolve default property of object ix. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-				'UPGRADE_WARNING: Couldn't resolve default property of object strWork. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-				'UPGRADE_WARNING: Couldn't resolve default property of object strPart(ix). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 				strPart(ix) = strWork ' current 'part' takes what's left
-				'UPGRADE_WARNING: Couldn't resolve default property of object strWork. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 				strWork = "" ' empty work string
 				Exit For
 			Else
 				' sepetator found, strip off LHS & continue
-				'UPGRADE_WARNING: Couldn't resolve default property of object ix. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-				'UPGRADE_WARNING: Couldn't resolve default property of object intPos. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-				'UPGRADE_WARNING: Couldn't resolve default property of object strWork. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-				'UPGRADE_WARNING: Couldn't resolve default property of object strPart(ix). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 				strPart(ix) = Left(strWork, intPos - 1)
-				'UPGRADE_WARNING: Couldn't resolve default property of object ix. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-				'UPGRADE_WARNING: Couldn't resolve default property of object intPos. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-				'UPGRADE_WARNING: Couldn't resolve default property of object strWork. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 				strWork = Mid(strWork, intPos + Len(strSep(ix)))
 			End If
 			
 			' remove repeating separators but only if it's a single space.
 			' "one two"   parses the same as "one     two" (if the separater is " ")
-			'UPGRADE_WARNING: Couldn't resolve default property of object ix. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 			If strSep(ix) = " " Then
-				'UPGRADE_WARNING: Couldn't resolve default property of object ix. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-				'UPGRADE_WARNING: Couldn't resolve default property of object strWork. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 				Do While InStr(1, strWork, strSep(ix)) = 1
-					'UPGRADE_WARNING: Couldn't resolve default property of object ix. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-					'UPGRADE_WARNING: Couldn't resolve default property of object strWork. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 					strWork = Mid(strWork, Len(strSep(ix)) + 1)
 				Loop 
 			End If
 		Next ix
 		
-		'UPGRADE_WARNING: Couldn't resolve default property of object strWork. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-		'UPGRADE_WARNING: Couldn't resolve default property of object strPart(cintMaxSep + 1). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		strPart(cintMaxSep + 1) = strWork 'the last bit takes what's left
 		
-		'UPGRADE_WARNING: Couldn't resolve default property of object strPart(1). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-		'UPGRADE_WARNING: Couldn't resolve default property of object rPart1. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		rPart1 = strPart(1)
-		'UPGRADE_WARNING: Couldn't resolve default property of object strPart(2). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-		'UPGRADE_WARNING: Couldn't resolve default property of object rPart2. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		rPart2 = strPart(2)
-		'UPGRADE_WARNING: Couldn't resolve default property of object strPart(3). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-		'UPGRADE_WARNING: Couldn't resolve default property of object rPart3. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		rPart3 = strPart(3)
-		'UPGRADE_WARNING: Couldn't resolve default property of object strPart(4). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-		'UPGRADE_WARNING: Couldn't resolve default property of object rPart4. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		rPart4 = strPart(4)
-		'UPGRADE_WARNING: Couldn't resolve default property of object strPart(5). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-		'UPGRADE_WARNING: Couldn't resolve default property of object rPart5. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		rPart5 = strPart(5)
-		'UPGRADE_WARNING: Couldn't resolve default property of object strPart(6). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-		'UPGRADE_WARNING: Couldn't resolve default property of object rPart6. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		rPart6 = strPart(6)
-		'UPGRADE_WARNING: Couldn't resolve default property of object strPart(7). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-		'UPGRADE_WARNING: Couldn't resolve default property of object rPart7. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		rPart7 = strPart(7)
-		'UPGRADE_WARNING: Couldn't resolve default property of object strPart(8). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-		'UPGRADE_WARNING: Couldn't resolve default property of object rPart8. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		rPart8 = strPart(8)
-		'UPGRADE_WARNING: Couldn't resolve default property of object strPart(9). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-		'UPGRADE_WARNING: Couldn't resolve default property of object rPart9. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		rPart9 = strPart(9)
-		'UPGRADE_WARNING: Couldn't resolve default property of object strPart(10). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-		'UPGRADE_WARNING: Couldn't resolve default property of object rPart10. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
 		rPart10 = strPart(10)
+        Return nothing '
 	End Function
 	
 	
@@ -277,8 +232,8 @@ Module basTextStringFuncs
 		'    Searches a string for a string.
 		'    What is returned is dictated to by the Option passed to it
 		
+        GetTextString = ""
 		Dim lngInstr As Integer
-		Dim intOccurrence As Short
 		Dim lngFirstPos As Integer
 		Dim lngNextPos As Integer
 		' If just finding string then set the initial return string to False (not found)
@@ -418,8 +373,7 @@ Module basTextStringFuncs
 		'     12.34 > 12
 		
 		Dim intPos As Short
-		Dim strReturnString As String
-		Dim strTestString As String
+		Dim strReturnString As String = ""
 		
 		intPos = 1
 		
@@ -450,8 +404,8 @@ Module basTextStringFuncs
 		'     12.34 > .34
 		
 		Dim intPos As Short
-		Dim strReturnString As String
-		Dim strTestString As String
+		Dim strReturnString As String = ""
+		Dim strTestString As String =""
 		
 		intPos = 1
 		
@@ -476,7 +430,7 @@ Module basTextStringFuncs
 		' the 1st occurrence of rstrFindText is replaced by rstrReplaceText in rstrText
 		
 		Dim lngPos As Integer
-		Dim strNewText As String
+		Dim strNewText As String = ""
 		Dim intFindLen As Short
 		Dim lngEndPos As Integer
 		ReplaceTextString = False
@@ -495,13 +449,14 @@ Module basTextStringFuncs
 		ReplaceTextString = True
 	End Function
 	
-	Function fncWord(ByRef rstrSentence As String, Optional ByRef rintWordno As Short = 1, Optional ByRef rstrSeparator As String = " ") As String
+	Private Function FncWord(ByRef rstrSentence As String, Optional ByRef rintWordno As Short = 1, Optional ByRef rstrSeparator As String = " ") 
 		' search the Sentence and return Word number rintWordNo
 		' If can't find separator then return the sentence
 		Dim ix As Short
 		Dim intPos As Short
 		Dim strSentence As String
 		
+	    FncWord = ""
 		strSentence = rstrSentence
 		
 		For ix = 1 To rintWordno
@@ -509,7 +464,7 @@ Module basTextStringFuncs
 			intPos = InStr(1, strSentence, rstrSeparator)
 			If intPos = 0 Then
 				If Not ix = rintWordno Then
-					fncWord = ""
+					FncWord = ""
 				Else
 					fncWord = strSentence
 				End If
@@ -540,14 +495,14 @@ Module basTextStringFuncs
 	' ------------------------------------------------------------------------------------
 	' Gibbo       | 18th Oct 01 | Initial creation.
 	'**************************************************************************************************
-	Public Function Get_Trailing_Numeric(ByRef strText As String, ByRef strOutText As String, ByRef lngOutNumeric As Integer) As Object
+	Public Sub Get_Trailing_Numeric(ByRef strText As String, ByRef strOutText As String, ByRef lngOutNumeric As Integer)
 		
 		Dim intPos As Short
 		Dim intNumericLength As Short
 		
 		If Len(Trim(strText)) = 0 Then
 			' this is an empty string
-			Exit Function
+			Exit Sub
 		End If
 		
 		intNumericLength = 0
@@ -573,7 +528,7 @@ Module basTextStringFuncs
 			strOutText = strText
 		End If
 		
-	End Function
+	End Sub
 	
 	
 	'***************************************************************************************
@@ -631,7 +586,7 @@ Module basTextStringFuncs
 	''**************************************************************************************************
 	''*******************************************************************************
 	'
-	'    Function identical to "fncWord" - redundant !
+	'    Function identical to "FncWord" - redundant !
 	'
 	'Public Function ParseStr(ByVal rstrSentence As String, intTokenNum As Integer, _
 	''                         strDelimitChr As String) As String

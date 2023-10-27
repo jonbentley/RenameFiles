@@ -1,8 +1,15 @@
 Option Strict Off
-Option Explicit On 
+Option Explicit On
 
+Imports System.Collections.Generic
 Imports System.IO
+Imports System.Linq
 Imports VB = Microsoft.VisualBasic
+Imports System.Reflection
+Imports MetadataExtractor
+Imports MetadataExtractor.Formats.Exif
+Imports RenameFilesApplication
+Imports System.Text
 
 Public Class RenameFiles
     Inherits System.Windows.Forms.Form
@@ -94,78 +101,82 @@ Public Class RenameFiles
     Public WithEvents Label26 As System.Windows.Forms.Label
     Public WithEvents txtNewExtension As System.Windows.Forms.TextBox
     Friend WithEvents chkExtensionAppendToOld As System.Windows.Forms.CheckBox
+    Friend WithEvents btnDisplayAllExifProperties As Button
+    Friend WithEvents btnExifDates As Button
     Friend WithEvents cmdReformatFileName As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.cmdThumb = New System.Windows.Forms.Button
-        Me.cmdMVI = New System.Windows.Forms.Button
-        Me.cmdRunFile = New System.Windows.Forms.Button
-        Me.txtLiteral3 = New System.Windows.Forms.TextBox
-        Me.cmdCreateFile = New System.Windows.Forms.Button
-        Me.cmdCancel = New System.Windows.Forms.Button
-        Me.chkSequenceNumber = New System.Windows.Forms.CheckBox
-        Me.txtSeqInc = New System.Windows.Forms.TextBox
-        Me.txtLiteral2 = New System.Windows.Forms.TextBox
-        Me.txtSeqPad = New System.Windows.Forms.TextBox
-        Me.txtSeqStartAt = New System.Windows.Forms.TextBox
-        Me.txtLiteral1 = New System.Windows.Forms.TextBox
-        Me.txtReplaceTo3 = New System.Windows.Forms.TextBox
-        Me.txtReplaceFrom3 = New System.Windows.Forms.TextBox
-        Me.txtReplaceTo2 = New System.Windows.Forms.TextBox
-        Me.txtReplaceFrom2 = New System.Windows.Forms.TextBox
-        Me.txtReplaceTo1 = New System.Windows.Forms.TextBox
-        Me.txtReplaceFrom1 = New System.Windows.Forms.TextBox
-        Me.chkAppendOriginalName = New System.Windows.Forms.CheckBox
-        Me.Line5 = New System.Windows.Forms.Label
-        Me.Line4 = New System.Windows.Forms.Label
-        Me.Line3 = New System.Windows.Forms.Label
-        Me.Line2 = New System.Windows.Forms.Label
-        Me.Line1 = New System.Windows.Forms.Label
-        Me.Label12 = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.Label10 = New System.Windows.Forms.Label
-        Me.Label9 = New System.Windows.Forms.Label
-        Me.Label8 = New System.Windows.Forms.Label
-        Me.Label7 = New System.Windows.Forms.Label
-        Me.Label6 = New System.Windows.Forms.Label
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.label1 = New System.Windows.Forms.Label
-        Me.cboDirectory = New System.Windows.Forms.ComboBox
-        Me.Label18 = New System.Windows.Forms.Label
-        Me.txtSearchPattern = New System.Windows.Forms.TextBox
-        Me.Label19 = New System.Windows.Forms.Label
-        Me.txtDateTimeTakenFormat = New System.Windows.Forms.TextBox
-        Me.btnTestPattern = New System.Windows.Forms.Button
-        Me.cmdDeleteRenameFiles = New System.Windows.Forms.Button
-        Me.chkAddDatePictureTaken = New System.Windows.Forms.CheckBox
-        Me.Label11 = New System.Windows.Forms.Label
-        Me.Label13 = New System.Windows.Forms.Label
-        Me.txtDeletePattern = New System.Windows.Forms.TextBox
-        Me.cmdDeletePattern = New System.Windows.Forms.Button
-        Me.Label14 = New System.Windows.Forms.Label
-        Me.txtLiteral0 = New System.Windows.Forms.TextBox
-        Me.Label15 = New System.Windows.Forms.Label
-        Me.Label16 = New System.Windows.Forms.Label
-        Me.Label17 = New System.Windows.Forms.Label
-        Me.Label20 = New System.Windows.Forms.Label
-        Me.Label21 = New System.Windows.Forms.Label
-        Me.txtAdjustYears = New System.Windows.Forms.TextBox
-        Me.txtAdjustMonths = New System.Windows.Forms.TextBox
-        Me.txtAdjustDays = New System.Windows.Forms.TextBox
-        Me.Label22 = New System.Windows.Forms.Label
-        Me.txtAdjustSeconds = New System.Windows.Forms.TextBox
-        Me.Label23 = New System.Windows.Forms.Label
-        Me.txtAdjustMinutes = New System.Windows.Forms.TextBox
-        Me.txtAdjustHours = New System.Windows.Forms.TextBox
-        Me.Label24 = New System.Windows.Forms.Label
-        Me.Label25 = New System.Windows.Forms.Label
-        Me.Label26 = New System.Windows.Forms.Label
-        Me.txtNewExtension = New System.Windows.Forms.TextBox
-        Me.chkExtensionAppendToOld = New System.Windows.Forms.CheckBox
-        Me.cmdReformatFileName = New System.Windows.Forms.Button
+        Me.cmdThumb = New System.Windows.Forms.Button()
+        Me.cmdMVI = New System.Windows.Forms.Button()
+        Me.btnDisplayAllExifProperties = New System.Windows.Forms.Button()
+        Me.btnExifDates = New System.Windows.Forms.Button()
+        Me.cmdRunFile = New System.Windows.Forms.Button()
+        Me.txtLiteral3 = New System.Windows.Forms.TextBox()
+        Me.cmdCreateFile = New System.Windows.Forms.Button()
+        Me.cmdCancel = New System.Windows.Forms.Button()
+        Me.chkSequenceNumber = New System.Windows.Forms.CheckBox()
+        Me.txtSeqInc = New System.Windows.Forms.TextBox()
+        Me.txtLiteral2 = New System.Windows.Forms.TextBox()
+        Me.txtSeqPad = New System.Windows.Forms.TextBox()
+        Me.txtSeqStartAt = New System.Windows.Forms.TextBox()
+        Me.txtLiteral1 = New System.Windows.Forms.TextBox()
+        Me.txtReplaceTo3 = New System.Windows.Forms.TextBox()
+        Me.txtReplaceFrom3 = New System.Windows.Forms.TextBox()
+        Me.txtReplaceTo2 = New System.Windows.Forms.TextBox()
+        Me.txtReplaceFrom2 = New System.Windows.Forms.TextBox()
+        Me.txtReplaceTo1 = New System.Windows.Forms.TextBox()
+        Me.txtReplaceFrom1 = New System.Windows.Forms.TextBox()
+        Me.chkAppendOriginalName = New System.Windows.Forms.CheckBox()
+        Me.Line5 = New System.Windows.Forms.Label()
+        Me.Line4 = New System.Windows.Forms.Label()
+        Me.Line3 = New System.Windows.Forms.Label()
+        Me.Line2 = New System.Windows.Forms.Label()
+        Me.Line1 = New System.Windows.Forms.Label()
+        Me.Label12 = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.Label10 = New System.Windows.Forms.Label()
+        Me.Label9 = New System.Windows.Forms.Label()
+        Me.Label8 = New System.Windows.Forms.Label()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.label1 = New System.Windows.Forms.Label()
+        Me.cboDirectory = New System.Windows.Forms.ComboBox()
+        Me.Label18 = New System.Windows.Forms.Label()
+        Me.txtSearchPattern = New System.Windows.Forms.TextBox()
+        Me.Label19 = New System.Windows.Forms.Label()
+        Me.txtDateTimeTakenFormat = New System.Windows.Forms.TextBox()
+        Me.btnTestPattern = New System.Windows.Forms.Button()
+        Me.cmdDeleteRenameFiles = New System.Windows.Forms.Button()
+        Me.chkAddDatePictureTaken = New System.Windows.Forms.CheckBox()
+        Me.Label11 = New System.Windows.Forms.Label()
+        Me.Label13 = New System.Windows.Forms.Label()
+        Me.txtDeletePattern = New System.Windows.Forms.TextBox()
+        Me.cmdDeletePattern = New System.Windows.Forms.Button()
+        Me.Label14 = New System.Windows.Forms.Label()
+        Me.txtLiteral0 = New System.Windows.Forms.TextBox()
+        Me.Label15 = New System.Windows.Forms.Label()
+        Me.Label16 = New System.Windows.Forms.Label()
+        Me.Label17 = New System.Windows.Forms.Label()
+        Me.Label20 = New System.Windows.Forms.Label()
+        Me.Label21 = New System.Windows.Forms.Label()
+        Me.txtAdjustYears = New System.Windows.Forms.TextBox()
+        Me.txtAdjustMonths = New System.Windows.Forms.TextBox()
+        Me.txtAdjustDays = New System.Windows.Forms.TextBox()
+        Me.Label22 = New System.Windows.Forms.Label()
+        Me.txtAdjustSeconds = New System.Windows.Forms.TextBox()
+        Me.Label23 = New System.Windows.Forms.Label()
+        Me.txtAdjustMinutes = New System.Windows.Forms.TextBox()
+        Me.txtAdjustHours = New System.Windows.Forms.TextBox()
+        Me.Label24 = New System.Windows.Forms.Label()
+        Me.Label25 = New System.Windows.Forms.Label()
+        Me.Label26 = New System.Windows.Forms.Label()
+        Me.txtNewExtension = New System.Windows.Forms.TextBox()
+        Me.chkExtensionAppendToOld = New System.Windows.Forms.CheckBox()
+        Me.cmdReformatFileName = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'cmdThumb
@@ -181,6 +192,7 @@ Public Class RenameFiles
         Me.cmdThumb.TabIndex = 42
         Me.cmdThumb.Text = "THM"
         Me.ToolTip1.SetToolTip(Me.cmdThumb, "Replace .THM extensions")
+        Me.cmdThumb.UseVisualStyleBackColor = False
         '
         'cmdMVI
         '
@@ -195,6 +207,25 @@ Public Class RenameFiles
         Me.cmdMVI.TabIndex = 41
         Me.cmdMVI.Text = "MVI"
         Me.ToolTip1.SetToolTip(Me.cmdMVI, "Replace _MVI and _IMG")
+        Me.cmdMVI.UseVisualStyleBackColor = False
+        '
+        'btnDisplayAllExifProperties
+        '
+        Me.btnDisplayAllExifProperties.Location = New System.Drawing.Point(473, 184)
+        Me.btnDisplayAllExifProperties.Name = "btnDisplayAllExifProperties"
+        Me.btnDisplayAllExifProperties.Size = New System.Drawing.Size(79, 16)
+        Me.btnDisplayAllExifProperties.TabIndex = 81
+        Me.btnDisplayAllExifProperties.Text = "Exif All"
+        Me.ToolTip1.SetToolTip(Me.btnDisplayAllExifProperties, "Display all Exif Properties for all the files")
+        '
+        'btnExifDates
+        '
+        Me.btnExifDates.Location = New System.Drawing.Point(553, 184)
+        Me.btnExifDates.Name = "btnExifDates"
+        Me.btnExifDates.Size = New System.Drawing.Size(79, 16)
+        Me.btnExifDates.TabIndex = 82
+        Me.btnExifDates.Text = "Exif Dates"
+        Me.ToolTip1.SetToolTip(Me.btnExifDates, "Display all Exif Date Properties for all the files")
         '
         'cmdRunFile
         '
@@ -208,11 +239,11 @@ Public Class RenameFiles
         Me.cmdRunFile.Size = New System.Drawing.Size(129, 25)
         Me.cmdRunFile.TabIndex = 40
         Me.cmdRunFile.Text = "&Run Last Rename File"
+        Me.cmdRunFile.UseVisualStyleBackColor = False
         '
         'txtLiteral3
         '
         Me.txtLiteral3.AcceptsReturn = True
-        Me.txtLiteral3.AutoSize = False
         Me.txtLiteral3.BackColor = System.Drawing.SystemColors.Window
         Me.txtLiteral3.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtLiteral3.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -221,7 +252,7 @@ Public Class RenameFiles
         Me.txtLiteral3.MaxLength = 0
         Me.txtLiteral3.Name = "txtLiteral3"
         Me.txtLiteral3.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtLiteral3.Size = New System.Drawing.Size(129, 19)
+        Me.txtLiteral3.Size = New System.Drawing.Size(129, 20)
         Me.txtLiteral3.TabIndex = 23
         Me.txtLiteral3.Text = " (J)"
         '
@@ -237,6 +268,7 @@ Public Class RenameFiles
         Me.cmdCreateFile.Size = New System.Drawing.Size(120, 25)
         Me.cmdCreateFile.TabIndex = 22
         Me.cmdCreateFile.Text = "&Create Rename File"
+        Me.cmdCreateFile.UseVisualStyleBackColor = False
         '
         'cmdCancel
         '
@@ -251,6 +283,7 @@ Public Class RenameFiles
         Me.cmdCancel.Size = New System.Drawing.Size(88, 25)
         Me.cmdCancel.TabIndex = 21
         Me.cmdCancel.Text = "Cancel"
+        Me.cmdCancel.UseVisualStyleBackColor = False
         '
         'chkSequenceNumber
         '
@@ -264,11 +297,11 @@ Public Class RenameFiles
         Me.chkSequenceNumber.Size = New System.Drawing.Size(160, 17)
         Me.chkSequenceNumber.TabIndex = 20
         Me.chkSequenceNumber.Text = "Add a Sequence Number"
+        Me.chkSequenceNumber.UseVisualStyleBackColor = False
         '
         'txtSeqInc
         '
         Me.txtSeqInc.AcceptsReturn = True
-        Me.txtSeqInc.AutoSize = False
         Me.txtSeqInc.BackColor = System.Drawing.SystemColors.Window
         Me.txtSeqInc.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtSeqInc.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -277,14 +310,13 @@ Public Class RenameFiles
         Me.txtSeqInc.MaxLength = 0
         Me.txtSeqInc.Name = "txtSeqInc"
         Me.txtSeqInc.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtSeqInc.Size = New System.Drawing.Size(129, 19)
+        Me.txtSeqInc.Size = New System.Drawing.Size(129, 20)
         Me.txtSeqInc.TabIndex = 16
         Me.txtSeqInc.Text = "10"
         '
         'txtLiteral2
         '
         Me.txtLiteral2.AcceptsReturn = True
-        Me.txtLiteral2.AutoSize = False
         Me.txtLiteral2.BackColor = System.Drawing.SystemColors.Window
         Me.txtLiteral2.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtLiteral2.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -293,14 +325,12 @@ Public Class RenameFiles
         Me.txtLiteral2.MaxLength = 0
         Me.txtLiteral2.Name = "txtLiteral2"
         Me.txtLiteral2.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtLiteral2.Size = New System.Drawing.Size(129, 19)
+        Me.txtLiteral2.Size = New System.Drawing.Size(129, 20)
         Me.txtLiteral2.TabIndex = 18
-        Me.txtLiteral2.Text = ""
         '
         'txtSeqPad
         '
         Me.txtSeqPad.AcceptsReturn = True
-        Me.txtSeqPad.AutoSize = False
         Me.txtSeqPad.BackColor = System.Drawing.SystemColors.Window
         Me.txtSeqPad.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtSeqPad.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -309,14 +339,13 @@ Public Class RenameFiles
         Me.txtSeqPad.MaxLength = 0
         Me.txtSeqPad.Name = "txtSeqPad"
         Me.txtSeqPad.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtSeqPad.Size = New System.Drawing.Size(129, 19)
+        Me.txtSeqPad.Size = New System.Drawing.Size(129, 20)
         Me.txtSeqPad.TabIndex = 17
         Me.txtSeqPad.Text = "4"
         '
         'txtSeqStartAt
         '
         Me.txtSeqStartAt.AcceptsReturn = True
-        Me.txtSeqStartAt.AutoSize = False
         Me.txtSeqStartAt.BackColor = System.Drawing.SystemColors.Window
         Me.txtSeqStartAt.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtSeqStartAt.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -325,14 +354,13 @@ Public Class RenameFiles
         Me.txtSeqStartAt.MaxLength = 0
         Me.txtSeqStartAt.Name = "txtSeqStartAt"
         Me.txtSeqStartAt.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtSeqStartAt.Size = New System.Drawing.Size(129, 19)
+        Me.txtSeqStartAt.Size = New System.Drawing.Size(129, 20)
         Me.txtSeqStartAt.TabIndex = 15
         Me.txtSeqStartAt.Text = "10"
         '
         'txtLiteral1
         '
         Me.txtLiteral1.AcceptsReturn = True
-        Me.txtLiteral1.AutoSize = False
         Me.txtLiteral1.BackColor = System.Drawing.SystemColors.Window
         Me.txtLiteral1.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtLiteral1.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -341,14 +369,12 @@ Public Class RenameFiles
         Me.txtLiteral1.MaxLength = 0
         Me.txtLiteral1.Name = "txtLiteral1"
         Me.txtLiteral1.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtLiteral1.Size = New System.Drawing.Size(64, 19)
+        Me.txtLiteral1.Size = New System.Drawing.Size(64, 20)
         Me.txtLiteral1.TabIndex = 14
-        Me.txtLiteral1.Text = ""
         '
         'txtReplaceTo3
         '
         Me.txtReplaceTo3.AcceptsReturn = True
-        Me.txtReplaceTo3.AutoSize = False
         Me.txtReplaceTo3.BackColor = System.Drawing.SystemColors.Window
         Me.txtReplaceTo3.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtReplaceTo3.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -357,14 +383,12 @@ Public Class RenameFiles
         Me.txtReplaceTo3.MaxLength = 0
         Me.txtReplaceTo3.Name = "txtReplaceTo3"
         Me.txtReplaceTo3.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtReplaceTo3.Size = New System.Drawing.Size(169, 19)
+        Me.txtReplaceTo3.Size = New System.Drawing.Size(169, 20)
         Me.txtReplaceTo3.TabIndex = 13
-        Me.txtReplaceTo3.Text = ""
         '
         'txtReplaceFrom3
         '
         Me.txtReplaceFrom3.AcceptsReturn = True
-        Me.txtReplaceFrom3.AutoSize = False
         Me.txtReplaceFrom3.BackColor = System.Drawing.SystemColors.Window
         Me.txtReplaceFrom3.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtReplaceFrom3.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -373,14 +397,12 @@ Public Class RenameFiles
         Me.txtReplaceFrom3.MaxLength = 0
         Me.txtReplaceFrom3.Name = "txtReplaceFrom3"
         Me.txtReplaceFrom3.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtReplaceFrom3.Size = New System.Drawing.Size(161, 19)
+        Me.txtReplaceFrom3.Size = New System.Drawing.Size(161, 20)
         Me.txtReplaceFrom3.TabIndex = 12
-        Me.txtReplaceFrom3.Text = ""
         '
         'txtReplaceTo2
         '
         Me.txtReplaceTo2.AcceptsReturn = True
-        Me.txtReplaceTo2.AutoSize = False
         Me.txtReplaceTo2.BackColor = System.Drawing.SystemColors.Window
         Me.txtReplaceTo2.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtReplaceTo2.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -389,14 +411,12 @@ Public Class RenameFiles
         Me.txtReplaceTo2.MaxLength = 0
         Me.txtReplaceTo2.Name = "txtReplaceTo2"
         Me.txtReplaceTo2.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtReplaceTo2.Size = New System.Drawing.Size(169, 19)
+        Me.txtReplaceTo2.Size = New System.Drawing.Size(169, 20)
         Me.txtReplaceTo2.TabIndex = 11
-        Me.txtReplaceTo2.Text = ""
         '
         'txtReplaceFrom2
         '
         Me.txtReplaceFrom2.AcceptsReturn = True
-        Me.txtReplaceFrom2.AutoSize = False
         Me.txtReplaceFrom2.BackColor = System.Drawing.SystemColors.Window
         Me.txtReplaceFrom2.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtReplaceFrom2.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -405,14 +425,13 @@ Public Class RenameFiles
         Me.txtReplaceFrom2.MaxLength = 0
         Me.txtReplaceFrom2.Name = "txtReplaceFrom2"
         Me.txtReplaceFrom2.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtReplaceFrom2.Size = New System.Drawing.Size(161, 19)
+        Me.txtReplaceFrom2.Size = New System.Drawing.Size(161, 20)
         Me.txtReplaceFrom2.TabIndex = 10
         Me.txtReplaceFrom2.Text = "img_"
         '
         'txtReplaceTo1
         '
         Me.txtReplaceTo1.AcceptsReturn = True
-        Me.txtReplaceTo1.AutoSize = False
         Me.txtReplaceTo1.BackColor = System.Drawing.SystemColors.Window
         Me.txtReplaceTo1.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtReplaceTo1.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -421,14 +440,12 @@ Public Class RenameFiles
         Me.txtReplaceTo1.MaxLength = 0
         Me.txtReplaceTo1.Name = "txtReplaceTo1"
         Me.txtReplaceTo1.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtReplaceTo1.Size = New System.Drawing.Size(169, 19)
+        Me.txtReplaceTo1.Size = New System.Drawing.Size(169, 20)
         Me.txtReplaceTo1.TabIndex = 9
-        Me.txtReplaceTo1.Text = ""
         '
         'txtReplaceFrom1
         '
         Me.txtReplaceFrom1.AcceptsReturn = True
-        Me.txtReplaceFrom1.AutoSize = False
         Me.txtReplaceFrom1.BackColor = System.Drawing.SystemColors.Window
         Me.txtReplaceFrom1.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtReplaceFrom1.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -437,7 +454,7 @@ Public Class RenameFiles
         Me.txtReplaceFrom1.MaxLength = 0
         Me.txtReplaceFrom1.Name = "txtReplaceFrom1"
         Me.txtReplaceFrom1.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtReplaceFrom1.Size = New System.Drawing.Size(161, 19)
+        Me.txtReplaceFrom1.Size = New System.Drawing.Size(161, 20)
         Me.txtReplaceFrom1.TabIndex = 8
         Me.txtReplaceFrom1.Text = "mvi_"
         '
@@ -455,6 +472,7 @@ Public Class RenameFiles
         Me.chkAppendOriginalName.Size = New System.Drawing.Size(257, 17)
         Me.chkAppendOriginalName.TabIndex = 6
         Me.chkAppendOriginalName.Text = "Append with the Original Name"
+        Me.chkAppendOriginalName.UseVisualStyleBackColor = False
         '
         'Line5
         '
@@ -520,9 +538,9 @@ Public Class RenameFiles
         Me.Label2.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.Label2.Size = New System.Drawing.Size(297, 49)
         Me.Label2.TabIndex = 27
-        Me.Label2.Text = "This Utility will take all the files in the current directory and create a batch " & _
-        """rename"" job to allow easy renaming of all the files.  The options below allow f" & _
-        "or tayloring of the ""new"" name"
+        Me.Label2.Text = "This Utility will take all the files in the current directory and create a batch " &
+    """rename"" job to allow easy renaming of all the files.  The options below allow f" &
+    "or tayloring of the ""new"" name"
         '
         'Label10
         '
@@ -561,8 +579,8 @@ Public Class RenameFiles
         Me.Label8.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.Label8.Size = New System.Drawing.Size(505, 25)
         Me.Label8.TabIndex = 7
-        Me.Label8.Text = "If Original name included then                     REPLACE                       " & _
-        "                           WITH"
+        Me.Label8.Text = "If Original name included then                     REPLACE                       " &
+    "                           WITH"
         '
         'Label7
         '
@@ -648,7 +666,7 @@ Public Class RenameFiles
         Me.cboDirectory.Name = "cboDirectory"
         Me.cboDirectory.Size = New System.Drawing.Size(488, 22)
         Me.cboDirectory.TabIndex = 48
-        Me.cboDirectory.Text = "C:\Photos\Add Times\Keith"
+        Me.cboDirectory.Text = "E:\Pictures_WIP\Temp"
         '
         'Label18
         '
@@ -666,7 +684,6 @@ Public Class RenameFiles
         'txtSearchPattern
         '
         Me.txtSearchPattern.AcceptsReturn = True
-        Me.txtSearchPattern.AutoSize = False
         Me.txtSearchPattern.BackColor = System.Drawing.SystemColors.Window
         Me.txtSearchPattern.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtSearchPattern.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -675,9 +692,9 @@ Public Class RenameFiles
         Me.txtSearchPattern.MaxLength = 0
         Me.txtSearchPattern.Name = "txtSearchPattern"
         Me.txtSearchPattern.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtSearchPattern.Size = New System.Drawing.Size(120, 19)
+        Me.txtSearchPattern.Size = New System.Drawing.Size(120, 20)
         Me.txtSearchPattern.TabIndex = 50
-        Me.txtSearchPattern.Text = "*.jpg"
+        Me.txtSearchPattern.Text = "**.jpg"
         '
         'Label19
         '
@@ -695,7 +712,6 @@ Public Class RenameFiles
         'txtDateTimeTakenFormat
         '
         Me.txtDateTimeTakenFormat.AcceptsReturn = True
-        Me.txtDateTimeTakenFormat.AutoSize = False
         Me.txtDateTimeTakenFormat.BackColor = System.Drawing.SystemColors.Window
         Me.txtDateTimeTakenFormat.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtDateTimeTakenFormat.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -704,7 +720,7 @@ Public Class RenameFiles
         Me.txtDateTimeTakenFormat.MaxLength = 0
         Me.txtDateTimeTakenFormat.Name = "txtDateTimeTakenFormat"
         Me.txtDateTimeTakenFormat.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtDateTimeTakenFormat.Size = New System.Drawing.Size(240, 19)
+        Me.txtDateTimeTakenFormat.Size = New System.Drawing.Size(240, 20)
         Me.txtDateTimeTakenFormat.TabIndex = 52
         Me.txtDateTimeTakenFormat.Text = "yyyyMMdd HH-mm-ss / [d ddd HH-mm] "
         '
@@ -730,8 +746,8 @@ Public Class RenameFiles
         Me.chkAddDatePictureTaken.Name = "chkAddDatePictureTaken"
         Me.chkAddDatePictureTaken.Size = New System.Drawing.Size(440, 16)
         Me.chkAddDatePictureTaken.TabIndex = 55
-        Me.chkAddDatePictureTaken.Text = "For Images with a ""Date Picture Taken"" attribute, add the date in the specified f" & _
-        "ormat"
+        Me.chkAddDatePictureTaken.Text = "For Images with a ""Date Picture Taken"" attribute, add the date in the specified f" &
+    "ormat"
         '
         'Label11
         '
@@ -757,7 +773,6 @@ Public Class RenameFiles
         'txtDeletePattern
         '
         Me.txtDeletePattern.AcceptsReturn = True
-        Me.txtDeletePattern.AutoSize = False
         Me.txtDeletePattern.BackColor = System.Drawing.SystemColors.Window
         Me.txtDeletePattern.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtDeletePattern.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -766,7 +781,7 @@ Public Class RenameFiles
         Me.txtDeletePattern.MaxLength = 0
         Me.txtDeletePattern.Name = "txtDeletePattern"
         Me.txtDeletePattern.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtDeletePattern.Size = New System.Drawing.Size(64, 19)
+        Me.txtDeletePattern.Size = New System.Drawing.Size(64, 20)
         Me.txtDeletePattern.TabIndex = 58
         Me.txtDeletePattern.Text = "*.thm"
         '
@@ -782,6 +797,7 @@ Public Class RenameFiles
         Me.cmdDeletePattern.Size = New System.Drawing.Size(80, 16)
         Me.cmdDeletePattern.TabIndex = 59
         Me.cmdDeletePattern.Text = "Delete"
+        Me.cmdDeletePattern.UseVisualStyleBackColor = False
         '
         'Label14
         '
@@ -799,7 +815,6 @@ Public Class RenameFiles
         'txtLiteral0
         '
         Me.txtLiteral0.AcceptsReturn = True
-        Me.txtLiteral0.AutoSize = False
         Me.txtLiteral0.BackColor = System.Drawing.SystemColors.Window
         Me.txtLiteral0.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtLiteral0.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -808,9 +823,8 @@ Public Class RenameFiles
         Me.txtLiteral0.MaxLength = 0
         Me.txtLiteral0.Name = "txtLiteral0"
         Me.txtLiteral0.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtLiteral0.Size = New System.Drawing.Size(64, 19)
+        Me.txtLiteral0.Size = New System.Drawing.Size(64, 20)
         Me.txtLiteral0.TabIndex = 61
-        Me.txtLiteral0.Text = ""
         '
         'Label15
         '
@@ -870,7 +884,6 @@ Public Class RenameFiles
         'txtAdjustYears
         '
         Me.txtAdjustYears.AcceptsReturn = True
-        Me.txtAdjustYears.AutoSize = False
         Me.txtAdjustYears.BackColor = System.Drawing.SystemColors.Window
         Me.txtAdjustYears.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtAdjustYears.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -879,14 +892,13 @@ Public Class RenameFiles
         Me.txtAdjustYears.MaxLength = 0
         Me.txtAdjustYears.Name = "txtAdjustYears"
         Me.txtAdjustYears.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtAdjustYears.Size = New System.Drawing.Size(48, 19)
+        Me.txtAdjustYears.Size = New System.Drawing.Size(48, 20)
         Me.txtAdjustYears.TabIndex = 67
         Me.txtAdjustYears.Text = "+0"
         '
         'txtAdjustMonths
         '
         Me.txtAdjustMonths.AcceptsReturn = True
-        Me.txtAdjustMonths.AutoSize = False
         Me.txtAdjustMonths.BackColor = System.Drawing.SystemColors.Window
         Me.txtAdjustMonths.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtAdjustMonths.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -895,14 +907,13 @@ Public Class RenameFiles
         Me.txtAdjustMonths.MaxLength = 0
         Me.txtAdjustMonths.Name = "txtAdjustMonths"
         Me.txtAdjustMonths.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtAdjustMonths.Size = New System.Drawing.Size(48, 19)
+        Me.txtAdjustMonths.Size = New System.Drawing.Size(48, 20)
         Me.txtAdjustMonths.TabIndex = 68
         Me.txtAdjustMonths.Text = "+0"
         '
         'txtAdjustDays
         '
         Me.txtAdjustDays.AcceptsReturn = True
-        Me.txtAdjustDays.AutoSize = False
         Me.txtAdjustDays.BackColor = System.Drawing.SystemColors.Window
         Me.txtAdjustDays.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtAdjustDays.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -911,7 +922,7 @@ Public Class RenameFiles
         Me.txtAdjustDays.MaxLength = 0
         Me.txtAdjustDays.Name = "txtAdjustDays"
         Me.txtAdjustDays.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtAdjustDays.Size = New System.Drawing.Size(48, 19)
+        Me.txtAdjustDays.Size = New System.Drawing.Size(48, 20)
         Me.txtAdjustDays.TabIndex = 70
         Me.txtAdjustDays.Text = "+0"
         '
@@ -931,7 +942,6 @@ Public Class RenameFiles
         'txtAdjustSeconds
         '
         Me.txtAdjustSeconds.AcceptsReturn = True
-        Me.txtAdjustSeconds.AutoSize = False
         Me.txtAdjustSeconds.BackColor = System.Drawing.SystemColors.Window
         Me.txtAdjustSeconds.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtAdjustSeconds.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -940,7 +950,7 @@ Public Class RenameFiles
         Me.txtAdjustSeconds.MaxLength = 0
         Me.txtAdjustSeconds.Name = "txtAdjustSeconds"
         Me.txtAdjustSeconds.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtAdjustSeconds.Size = New System.Drawing.Size(48, 19)
+        Me.txtAdjustSeconds.Size = New System.Drawing.Size(48, 20)
         Me.txtAdjustSeconds.TabIndex = 76
         Me.txtAdjustSeconds.Text = "+0"
         '
@@ -960,7 +970,6 @@ Public Class RenameFiles
         'txtAdjustMinutes
         '
         Me.txtAdjustMinutes.AcceptsReturn = True
-        Me.txtAdjustMinutes.AutoSize = False
         Me.txtAdjustMinutes.BackColor = System.Drawing.SystemColors.Window
         Me.txtAdjustMinutes.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtAdjustMinutes.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -969,14 +978,13 @@ Public Class RenameFiles
         Me.txtAdjustMinutes.MaxLength = 0
         Me.txtAdjustMinutes.Name = "txtAdjustMinutes"
         Me.txtAdjustMinutes.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtAdjustMinutes.Size = New System.Drawing.Size(48, 19)
+        Me.txtAdjustMinutes.Size = New System.Drawing.Size(48, 20)
         Me.txtAdjustMinutes.TabIndex = 74
         Me.txtAdjustMinutes.Text = "+0"
         '
         'txtAdjustHours
         '
         Me.txtAdjustHours.AcceptsReturn = True
-        Me.txtAdjustHours.AutoSize = False
         Me.txtAdjustHours.BackColor = System.Drawing.SystemColors.Window
         Me.txtAdjustHours.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtAdjustHours.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -985,7 +993,7 @@ Public Class RenameFiles
         Me.txtAdjustHours.MaxLength = 0
         Me.txtAdjustHours.Name = "txtAdjustHours"
         Me.txtAdjustHours.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtAdjustHours.Size = New System.Drawing.Size(48, 19)
+        Me.txtAdjustHours.Size = New System.Drawing.Size(48, 20)
         Me.txtAdjustHours.TabIndex = 73
         Me.txtAdjustHours.Text = "+0"
         '
@@ -1031,7 +1039,6 @@ Public Class RenameFiles
         'txtNewExtension
         '
         Me.txtNewExtension.AcceptsReturn = True
-        Me.txtNewExtension.AutoSize = False
         Me.txtNewExtension.BackColor = System.Drawing.SystemColors.Window
         Me.txtNewExtension.Cursor = System.Windows.Forms.Cursors.IBeam
         Me.txtNewExtension.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -1040,9 +1047,8 @@ Public Class RenameFiles
         Me.txtNewExtension.MaxLength = 0
         Me.txtNewExtension.Name = "txtNewExtension"
         Me.txtNewExtension.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.txtNewExtension.Size = New System.Drawing.Size(129, 19)
+        Me.txtNewExtension.Size = New System.Drawing.Size(129, 20)
         Me.txtNewExtension.TabIndex = 78
-        Me.txtNewExtension.Text = ""
         '
         'chkExtensionAppendToOld
         '
@@ -1067,6 +1073,8 @@ Public Class RenameFiles
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.CancelButton = Me.cmdCancel
         Me.ClientSize = New System.Drawing.Size(642, 726)
+        Me.Controls.Add(Me.btnExifDates)
+        Me.Controls.Add(Me.btnDisplayAllExifProperties)
         Me.Controls.Add(Me.cmdReformatFileName)
         Me.Controls.Add(Me.chkExtensionAppendToOld)
         Me.Controls.Add(Me.txtNewExtension)
@@ -1141,6 +1149,7 @@ Public Class RenameFiles
         Me.Name = "RenameFiles"
         Me.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 #End Region
@@ -1155,6 +1164,8 @@ Public Class RenameFiles
         mstrRenameFile = ""
         InitializeFields()
         SetUpFields_MVI_IMG()
+        Dim Version As Version = Assembly.GetExecutingAssembly().GetName().Version
+        Me.Text = "Rename Files v" & Version.Major & "." & Version.MajorRevision & "." & Version.Minor
 
     End Sub
 
@@ -1219,13 +1230,47 @@ Public Class RenameFiles
             MsgBox("Directory does not exist : " & cboDirectory.Text)
             Return Nothing
         End If
-        Return System.IO.Directory.GetFiles(cboDirectory.Text, strPattern)
+
+        Dim fileList As String() = System.IO.Directory.GetFiles(cboDirectory.Text, strPattern)
+        Return fileList
 
     End Function
 
-    Private Function B_GenerateListOfNewFileNames(ByRef rcolFileNames_Old As Collection, _
-                                                  ByRef rcolFileNames_New As Collection) As Object
-        ' For each passed file name, generate it's new file name based on the values
+    Private Sub DisplayAllExifPropertiesForAllFiles(rstrDirectory As String, ByRef rcolFileNames_Old As Collection)
+
+        Dim results As New StringBuilder()
+        Dim MtdExtWrapper As New RenameFilesApplication.MetaDataExtractorWrapper()
+
+        ' Loop round all the files
+        Dim ix As Integer
+        For ix = 1 To rcolFileNames_Old.Count()
+            Dim allValues As String = MtdExtWrapper.GetListOfAllExifValues(rstrDirectory & "\" & rcolFileNames_Old.Item(ix))
+
+            results.AppendLine(allValues)
+        Next ix
+
+        FileOperations.String_To_Tempfile(results.ToString, "All Exif Properties", "txt", True)
+    End Sub
+
+    Private Sub DisplayAllExifDatePropertiesForAllFiles(rstrDirectory As String, ByRef rcolFileNames_Old As Collection)
+
+        Dim results As New StringBuilder()
+        Dim MtdExtWrapper As New RenameFilesApplication.MetaDataExtractorWrapper()
+
+        ' Loop round all the files
+        Dim ix As Integer
+        For ix = 1 To rcolFileNames_Old.Count()
+            Dim allValues As String = MtdExtWrapper.GetListOfAllExifDateValues(rstrDirectory & "\" & rcolFileNames_Old.Item(ix))
+
+            results.AppendLine(allValues)
+        Next ix
+
+        FileOperations.String_To_Tempfile(results.ToString, "All Exif Date Properties", "txt", True)
+    End Sub
+
+    Private Sub B_GenerateListOfNewFileNames(ByRef rcolFileNames_Old As Collection,
+                                                  ByRef rcolFileNames_New As Collection)
+        ' For each passed file name, generate its new file name based on the values
         ' set on the form
         Dim ix As Integer
         Dim strExtension As String = ""
@@ -1235,6 +1280,7 @@ Public Class RenameFiles
         Dim intSeq As Short
         Dim strSeq As String
         rcolFileNames_New = New Collection
+        Dim dateConversonMessages As StringBuilder = New StringBuilder
 
         '--------------------------------------------------------------
         ' if sequence number required - set up the start value
@@ -1256,7 +1302,27 @@ Public Class RenameFiles
             ' Set Date Time the picture was taken
             If chkAddDatePictureTaken.CheckState Then
                 If txtDateTimeTakenFormat.Text <> "" Then
-                    Dim dtDateTimeTaken As Date = ExifWrapper_DateTimeTaken(cboDirectory.Text & "\" & rcolFileNames_Old.Item(ix))
+                    'Dim dtDateTimeTaken As Date = ExifWrapper_DateTimeTaken(cboDirectory.Text & "\" & rcolFileNames_Old.Item(ix))
+
+                    Dim dtDateTimeTaken As Date
+
+                    Dim MtdExtWrapper As New RenameFilesApplication.MetaDataExtractorWrapper()
+                    Dim dateSuccess As Boolean = MtdExtWrapper.GetExifDateTimePhotoTaken(cboDirectory.Text & "\" & rcolFileNames_Old.Item(ix), dtDateTimeTaken)
+
+                    If dateSuccess = False Then
+                        dateConversonMessages.AppendLine($"{rcolFileNames_Old.Item(ix)} has an unreliable date {dtDateTimeTaken.ToString} - need to check it")
+                    End If
+
+                    If 1 = 2 Then
+                        Dim allValues As String = MtdExtWrapper.GetListOfAllExifValues(cboDirectory.Text & "\" & rcolFileNames_Old.Item(ix))
+                        FileOperations.String_To_Tempfile(allValues, "Exif_Values", "txt", True)
+                    End If
+
+                    If 1 = 2 Then
+                        Dim allDateValues As String = MtdExtWrapper.GetListOfAllExifDateValues(cboDirectory.Text & "\" & rcolFileNames_Old.Item(ix))
+                        FileOperations.String_To_Tempfile(allDateValues, "Exif_Values", "txt", True)
+                    End If
+
                     ' Adjust the date/time
                     ' really should have some proper validation - ho hum.
                     Try
@@ -1267,16 +1333,24 @@ Public Class RenameFiles
                         dtDateTimeTaken = dtDateTimeTaken.AddMinutes(txtAdjustMinutes.Text)
                         dtDateTimeTaken = dtDateTimeTaken.AddSeconds(txtAdjustSeconds.Text)
                     Catch ex As Exception
-                        MsgBox("You've probably put a non numeric value is teh dat adjusting fields" & vbCrLf & vbCrLf _
+                        MsgBox("You've probably put a non numeric value is the date adjusting fields" & vbCrLf & vbCrLf _
                         & ex.ToString)
 
                     End Try
 
                     strNewName &= Format(dtDateTimeTaken, txtDateTimeTakenFormat.Text)
+
+                    ' if the date conversion was iffy then put a warning in the name - it can easily be removed using this utiltiy!
+                    If dateSuccess = False Then
+                        strNewName &= "xxx Check the date xxx"
+                    End If
+
                 End If
+
             End If
+
             '--------------------------------------------------------------
-            ' Now another literal
+            ' Now another literal - test change * *  *
             strNewName &= txtLiteral1.Text
             '--------------------------------------------------------------
             ' if sequence number required - append it
@@ -1351,19 +1425,26 @@ Public Class RenameFiles
             rcolFileNames_New.Add(strNewName)
 
         Next ix
-    End Function
 
-    Private Function B2_GenerateListOfNewFileNames_ManualOnly(ByRef rcolFileNames_Old As Collection, _
-                                                             ByRef rcolFileNames_New As Collection) As Object
+        If dateConversonMessages.ToString.Length > 0 Then
+            FileOperations.String_To_Tempfile(dateConversonMessages.ToString(), "Problems With Dates", "txt", True)
+            Dim msg = "Some of the dates could not be reliably got." + vbCrLf
+            msg &= "Edit the rename file to remove the duff ones, then run it to processes the good ones, then copy the good ones somewhere out the way." + vbCrLf
+            msg &= "Run this again selecting the 'Exif Date Fields' to see what date info is available." + vbCrLf
+            msg &= "Then either generate another rename batch file and manually edit it using the Exif data available, or manaully rename the files!" + vbCrLf
+            MsgBox(msg)
+
+        End If
+    End Sub
+
+    Private Sub B2_GenerateListOfNewFileNames_ManualOnly(ByRef rcolFileNames_Old As Collection,
+                                                             ByRef rcolFileNames_New As Collection)
         ' For each passed file name, generate it's new file name based on the values
         ' set on the form
         Dim ix As Integer
         Dim strExtension As String = ""
-        Dim strName As String = ""
         Dim strOldName As String = ""
         Dim strNewName As String = ""
-        Dim intSeq As Short
-        Dim strSeq As String
         rcolFileNames_New = New Collection
 
 
@@ -1373,12 +1454,10 @@ Public Class RenameFiles
             strExtension = GetTextString(1, rcolFileNames_Old.Item(ix), ".", basTextStringFuncs.GETSTRING.TextAfterLastFindString)
             strOldName = GetTextString(1, rcolFileNames_Old.Item(ix), ".", basTextStringFuncs.GETSTRING.TextBeforeLastFindString)
 
-            Dim str1 As String
-            Dim str2 As String
-            Dim str3 As String
-            Dim str4 As String
-            Dim str5 As String
-            Dim strLastBit As String
+            Dim str1 As String = ""
+            Dim str2 As String = ""
+            Dim str3 As String = ""
+            Dim strLastBit As String = ""
             StringFunctions.ParseVar(strOldName, str1, "RB-2011", str2, "s-", str3, strLastBit)
 
             strNewName = str1 & str3 & strLastBit & "." & strExtension.ToLower
@@ -1386,11 +1465,11 @@ Public Class RenameFiles
             rcolFileNames_New.Add(strNewName)
 
         Next ix
-    End Function
+    End Sub
 
-    Private Function C_CreateBatchFile(ByRef rcolFileNames_Old As Collection, _
+    Private Function C_CreateBatchFile(ByRef rcolFileNames_Old As Collection,
                                        ByRef rcolFileNames_New As Collection) As Integer
-        Dim strRenameCommands As String
+        Dim strRenameCommands As String = ""
         Dim ix As Object
 
         mstrRenameFile = cboDirectory.Text & "\" & "RenameFiles_" & Format(Now, "yyMMdd_hh-mm-ss") & ".bat"
@@ -1401,23 +1480,22 @@ Public Class RenameFiles
         strRenameCommands &= vbCrLf & "pause"
 
         ' Create a Batch file from the string
-        ' Do NOT "open" then file because "open" will "run" with a file type of .bat !
+        ' Do NOT "open" the file because "open" will "run" with a file type of .bat !
         FileOperations.String_To_File(strRenameCommands, mstrRenameFile, False)
         cmdRunFile.Enabled = True
 
-        Dim strError As String
-        If FileOperations.OpenFileinNotepad(mstrRenameFile, strError) > 0 Then MsgBox(strError)
+        ' Do not Open the file as it will run
+        Dim strError As String = ""
+        If FileOperations.OpenFileinNotepadPlusPlus(mstrRenameFile, strError) > 0 Then MsgBox(strError)
 
     End Function
-
 
     Private Sub cmdMVI_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdMVI.Click
         SetUpFields_MVI_IMG()
     End Sub
 
     Private Sub cmdRunFile_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdRunFile.Click
-        Dim rc As Integer
-        Dim strError As String
+        Dim strError As String = ""
 
         ' "open" the command file
         If FileOperations.OpenFile(mstrRenameFile, "", strError) > 0 Then
@@ -1444,7 +1522,7 @@ Public Class RenameFiles
         End If
     End Sub
 
-    Private Function InitializeFields() As Object
+    Private Sub InitializeFields()
         txtLiteral1.Text = ""
         chkSequenceNumber.CheckState = System.Windows.Forms.CheckState.Unchecked
         txtSeqStartAt.Text = "10"
@@ -1459,10 +1537,10 @@ Public Class RenameFiles
         txtReplaceFrom3.Text = ""
         txtReplaceTo3.Text = ""
         txtLiteral3.Text = ""
-    End Function
+    End Sub
 
 
-    Private Function SetUpFields_MVI_IMG() As Object
+    Private Sub SetUpFields_MVI_IMG()
         InitializeFields()
         txtLiteral1.Text = ""
         chkSequenceNumber.CheckState = System.Windows.Forms.CheckState.Unchecked
@@ -1475,9 +1553,9 @@ Public Class RenameFiles
         txtReplaceFrom3.Text = ""
         txtReplaceTo3.Text = ""
         txtLiteral3.Text = ""
-    End Function
+    End Sub
 
-    Private Function SetUpFields_Thumb() As Object
+    Private Sub SetUpFields_Thumb()
         InitializeFields()
         txtLiteral1.Text = ""
         chkSequenceNumber.CheckState = System.Windows.Forms.CheckState.Unchecked
@@ -1490,28 +1568,50 @@ Public Class RenameFiles
         txtReplaceFrom3.Text = ""
         txtReplaceTo3.Text = ""
         txtLiteral3.Text = ""
-    End Function
+    End Sub
 
     Public Function ExifWrapper_DateTimeTaken(ByVal rstrFile As String) As Date
 
         Dim R As ExifReader
         Try
-
-            ''-- Load image
-            'Dim I As System.Drawing.Bitmap
-            'Try
-            '    I = New System.Drawing.Bitmap(rstrFile)
-            'Catch ex As Exception
-            '    MsgBox("Error: Can't load image, error: " & ex.Message)
-            'End Try
-            'If I.PropertyIdList.Length = 0 Then MsgBox("This image does not contain any EXIF data")
-
             R = New ExifReader(rstrFile)
 
             Return R.DateTimeOriginal
 
         Catch ex As Exception
             Throw New Exception("Error in ExifWrapper_DateTimeTaken" & vbCrLf & ex.ToString)
+        Finally
+            R = Nothing
+            GC.Collect()
+        End Try
+
+    End Function
+
+    Public Function ExifWrapper_DateTimeDigitized(ByVal rstrFile As String) As Date
+
+        Dim R As ExifReader
+        Try
+            R = New ExifReader(rstrFile)
+            Return R.DateTimeDigitized
+
+        Catch ex As Exception
+            Throw New Exception("Error in ExifWrapper_DateTimeDigitized" & vbCrLf & ex.ToString)
+        Finally
+            R = Nothing
+            GC.Collect()
+        End Try
+
+    End Function
+
+    Public Function ExifWrapper_DateTimeLastModified(ByVal rstrFile As String) As Date
+
+        Dim R As ExifReader
+        Try
+            R = New ExifReader(rstrFile)
+            Return R.DateTimeLastModified
+
+        Catch ex As Exception
+            Throw New Exception("Error in ExifWrapper_DateTimeLastModified" & vbCrLf & ex.ToString)
         Finally
             R = Nothing
             GC.Collect()
@@ -1534,18 +1634,14 @@ Public Class RenameFiles
 
     End Sub
 
-    Private Sub cboDirectory_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboDirectory.SelectedIndexChanged
-
-    End Sub
-
     Private Sub cmdDeletePattern_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDeletePattern.Click
         ' Delete all files that match the pattern
         Dim strFileList As String() = GetTheFiles(txtDeletePattern.Text)
-        Dim strFiles As String
+        Dim strFiles As String = ""
         FileOperations.Array_To_String(strFileList, strFiles)
 
         ' Prompt - are you sure?
-        If MsgBox("Are you sure you want to delete the follwoing files..." & vbCrLf & strFiles, MsgBoxStyle.YesNo, "Delete these files?") = MsgBoxResult.Yes Then
+        If MsgBox("Are you sure you want to delete the following files..." & vbCrLf & strFiles, MsgBoxStyle.YesNo, "Delete these files?") = MsgBoxResult.Yes Then
             For Each strFileToDelete As String In strFileList
                 System.IO.File.Delete(strFileToDelete)
             Next
@@ -1555,5 +1651,35 @@ Public Class RenameFiles
 
     Private Sub cmdReformatFileName_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReformatFileName.Click
         MessageBox.Show("To reformat the existing file name then edit the source, put a breakpoint in section B and do it manually.  It is not worth tryng to create a generic solution")
+    End Sub
+
+    Private Sub btnDisplayAllExifProperties_Click(sender As Object, e As EventArgs) Handles btnDisplayAllExifProperties.Click
+        Dim colFileNames_Old As New Collection
+
+        ' Must be a directory
+        If System.IO.Directory.Exists(cboDirectory.Text) = False Then
+            MsgBox("The ""Directory"" box must contain a valid directory")
+            cboDirectory.Focus()
+            Exit Sub
+        End If
+
+        A_GetListOfFilesInDirectory(colFileNames_Old)
+
+        DisplayAllExifPropertiesForAllFiles(cboDirectory.Text, colFileNames_Old)
+    End Sub
+
+    Private Sub btnExifDates_Click(sender As Object, e As EventArgs) Handles btnExifDates.Click
+        Dim colFileNames_Old As New Collection
+
+        ' Must be a directory
+        If System.IO.Directory.Exists(cboDirectory.Text) = False Then
+            MsgBox("The ""Directory"" box must contain a valid directory")
+            cboDirectory.Focus()
+            Exit Sub
+        End If
+
+        A_GetListOfFilesInDirectory(colFileNames_Old)
+
+        DisplayAllExifDatePropertiesForAllFiles(cboDirectory.Text, colFileNames_Old)
     End Sub
 End Class

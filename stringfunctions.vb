@@ -1,6 +1,6 @@
 Public Class StringFunctions
 
-    Public Shared Function ParseVar(ByVal rString As String, _
+    Public Shared Sub ParseVar(ByVal rString As String, _
                                         Optional ByRef rPart1 As String = "", Optional ByRef rSep1 As String = "", _
                                         Optional ByRef rPart2 As String = "", Optional ByRef rSep2 As String = "", _
                                         Optional ByRef rPart3 As String = "", Optional ByRef rSep3 As String = "", _
@@ -59,13 +59,13 @@ Public Class StringFunctions
         '***************************************************************************************
 
 
-        Const cintMaxSep = 9
-        Dim intPos
-        Dim strWork
+        Const cintMaxSep As Integer = 9
+        Dim intPos As Integer
+        Dim strWork As String
         Dim strSep(10) As String
 
         Dim strPart(10) As String
-        Dim ix
+        Dim ix As Integer
 
         strSep(1) = rSep1
         strSep(2) = rSep2
@@ -115,7 +115,7 @@ Public Class StringFunctions
         rPart9 = strPart(9)
         rPart10 = strPart(10)
 
-    End Function
+    End Sub
 
 
 End Class
