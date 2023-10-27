@@ -11,7 +11,6 @@
 ''' </remarks>
 ''' <history>
 ''' 	[altair] 	10.9.2003	Created
-''' v5
 ''' </history>
 '''-----------------------------------------------------------------------------
 Public Class ExifReader
@@ -407,7 +406,7 @@ Public Class ExifReader
     ''' <summary>
     '''     Initializes new instance of this class.
     ''' </summary>
-    ''' <param name="Bitmap">Bitmap to read exif information from</param>
+    ''' <param name="rstrImageFilename">Bitmap to read exif information from</param>
     ''' <remarks></remarks>
     ''' <history>
     ''' 	[Jon B] 	6.9.2005	Created
@@ -416,7 +415,7 @@ Public Class ExifReader
     Public Sub New(ByVal rstrImageFilename As String)
 
         '-- Load image
-        Dim imgBitmap As System.Drawing.Bitmap
+        Dim imgBitmap As Bitmap
         Try
             imgBitmap = New System.Drawing.Bitmap(rstrImageFilename)
         Catch ex As Exception
@@ -919,7 +918,7 @@ Public Class ExifReader
     ''' <summary>
     '''     Checks if current image has specified certain property
     ''' </summary>
-    ''' <param name="PropertyID"></param>
+    ''' <param name="PID">Property Id</param>
     ''' <returns>True if image has specified property, False otherwise.</returns>
     ''' <remarks></remarks>
     ''' <history>
@@ -937,7 +936,6 @@ Public Class ExifReader
     ''' <param name="PID">Property ID</param>
     ''' <param name="DefaultValue">Optional, default 0. Default value returned if property is not present.</param>
     ''' <remarks>Value of property or DefaultValue if property is not present.</remarks>
-    ''' <remarks></remarks>
     ''' <history>
     ''' 	[altair] 	10.9.2003	Created
     ''' </history>
@@ -957,7 +955,6 @@ Public Class ExifReader
     ''' <param name="PID">Property ID</param>
     ''' <param name="DefaultValue">Optional, default 0. Default value returned if property is not present.</param>
     ''' <remarks>Value of property or DefaultValue if property is not present.</remarks>
-    ''' <remarks></remarks>
     ''' <history>
     ''' 	[altair] 	10.9.2003	Created
     ''' </history>
