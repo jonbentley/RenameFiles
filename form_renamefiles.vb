@@ -1165,7 +1165,7 @@ Public Class RenameFiles
         InitializeFields()
         SetUpFields_MVI_IMG()
         Dim Version As Version = Assembly.GetExecutingAssembly().GetName().Version
-        Me.Text = "Rename Files v" & Version.Major & "." & Version.MajorRevision & "." & Version.Minor
+        Me.Text = "Rename Files v" & Version.Major & "." & Version.Minor & "." & Version.Build
 
     End Sub
 
