@@ -29,7 +29,7 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below
 
 
-<Assembly: AssemblyVersion("5.0.*")> 
+<Assembly: AssemblyVersion("6.0.1")> 
 
 
 
